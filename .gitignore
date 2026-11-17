@@ -1,0 +1,14 @@
+# Derleme çıktıları (build artifacts)
+*.o
+*.obj
+*.exe
+*.out
+plagiarism
+/build/
+
+# İşletim sistemi / editör (OS / editor)
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp

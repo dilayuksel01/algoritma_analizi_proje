@@ -1,0 +1,43 @@
+Expected result for the sample set
+main_doc.txt has 30 sentences; 20 of them are copied from 5 documents. All other documents: 0.0%.
+
+1) document18.txt   similarity 26.7%   (8 of 30 sentences)
+   "The power of Congress over this subject should not be surrendered until we have satisfactory evidence that the people of the State to be created would exercise the exclusive power of the State over this subject in the same way."
+   "The power of Congress over this subject should not be surrendered until we have satisfactory evidence that the people of the State to be created would exercise the exclusive power of the State over this subject in the same way."
+   "Proper restrictions as to the power to levy taxes and to create debt also must be imposed."
+   "Proper restrictions as to the power to levy taxes and to create debt should be imposed."   [edited: replaced "should" with "must"; inserted "also"]
+   "The report of the Civil Service Commission must receive the attention careful of the opponents as well as the friends of this reform."
+   "The report of the Civil Service Commission should receive the careful attention of the opponents as well as the friends of this reform."   [edited: replaced "should" with "must"; swapped "careful" and "attention"]
+   "It is difficult, well-nigh impossible, for so large a body as the Congress to conduct the essential negotiations and investigations."
+   "It is very difficult, well-nigh impossible, for so large a body as the Congress to conduct the necessary negotiations and investigations."   [edited: replaced "necessary" with "essential"; deleted "very"]
+   "This fault should not be committed in dealing with a subject that will before many years affect so vitally thousands of our people."
+   "This fault should not be committed in dealing with a subject that will before many years affect so vitally thousands of our people."
+   ... and 3 more pairs
+2) document14.txt   similarity 16.7%   (5 of 30 sentences)
+   "With the possession of such a station the United States, neither we nor any other American nation need longer apprehend injury or offense from any transatlantic enemy."
+   "With the possession of such a station by the United States, neither we nor any other American nation need longer apprehend injury or offense from any transatlantic enemy."   [edited: deleted "by"]
+   "Under these circumstances it becomes a question whether we shall not propose to Her Majesty's Government a suspension or discontinuance of the stipulations for maintaining a naval force for the suppression of that trade."
+   "Under these circumstances it becomes a question whether we shall not propose to Her Majesty's Government a suspension or discontinuance of the stipulations for maintaining a naval force for the suppression of that trade."
+   "It is my firm conviction that the issue of legal-tender paper money based wholly upon the authority and credit of the Government, except in extreme emergency, is without warrant in the Constitution and a violation of sound financial principles."
+   "It is my firm conviction that the issue of legal-tender paper money based wholly upon the authority and credit of the Government, except in extreme emergency, is without warrant in the Constitution and a violation of sound financial principles."
+   "The Supreme Court of the United States has decided the law to be within the legislative power of Congress and binding as a rule of action for all who reside within Territories."
+   "The Supreme Court of the United States has decided the law to be within the legislative power of Congress and binding as a rule of action for all who reside within the Territories."   [edited: deleted "the"]
+   "I agree with them also that it is wise to leave the question of such absorption to this process of natural political gravitation."
+   "I agree with them also that it is wise to leave the question of such absorption to this process of natural political gravitation."
+3) document20.txt   similarity 13.3%   (4 of 30 sentences)
+   "This satisfactory situation between the two countries leads me to anticipate an expansion of our trade with Mexico and an increased contribution of capital and industry by our people to the development of the great resources of that country."
+   "This satisfactory situation between the two countries leads me to anticipate an expansion of our trade with Mexico and an increased contribution of capital and industry by our people to the development of the great resources of that country."
+   "This reduction is to be attributed mainly to the operation of the law passed June 17, 1878, changing the compensation of postmasters from a commission on the value of stamps sold to a commission on stamps canceled."
+   "This reduction is to be attributed mainly to the operation of the law passed June 17, 1878, changing the compensation of postmasters from a commission on the value of stamps sold to a commission on stamps canceled."
+   "Diplomatic intercourse with Colombia is again fully restored by arrival the of a minister from that nation to the United States."
+   "Diplomatic intercourse with Colombia is again fully restored by the arrival of a minister from that country to the United States."   [edited: swapped "the" and "arrival"; replaced "country" with "nation"]
+   "If prosperity should attend the enterprise of its transportation across the Atlantic, its erection in a conspicuous position in the chief commercial city of the nation will soon be accomplished."
+   "If prosperity should attend the enterprise of its transportation across the Atlantic, its erection in a conspicuous position in the chief commercial city of the nation will soon be accomplished."
+4) document3.txt   similarity 6.7%   (2 of 30 sentences)
+   "The whole matter of the currency would have been placed where by the Constitution it was designed to be placed-under the immediate supervision and control of Congress."
+   "The whole matter of the currency would have been placed where by the Constitution it was designed to be placed-under the immediate supervision and control of Congress."
+   "The interests which are involved are of too significant a character to lead to the recommendation of any other than liberal a policy."
+   "The interests which are involved are of too important a character to lead to the recommendation of any other than a liberal policy."   [edited: replaced "important" with "significant"; swapped "a" and "liberal"]
+5) document4.txt   similarity 3.3%   (1 of 30 sentences)
+   "It is called for by the events which have changed, and may be expected still further to change, the relative situation of our frontiers."
+   "It is called for by the events which have changed, and may be expected still further to change, the relative situation of our frontiers."
