@@ -1,1 +1,342 @@
 
+#include <iostream>
+#include <fstream>
+#include <sstream>
+#include <vector>
+#include <string>
+#include <unordered_map>
+#include <algorithm>
+#include <filesystem>
+#include <chrono>
+#include <iomanip>
+#include <cctype>
+#include <cmath>
+#include <cstdlib>
+using namespace std;
+namespace fs = std::filesystem;
+
+const double T = 0.65;
+
+struct Sentence {
+    string text;
+    vector<string> w;
+};
+
+struct Source {
+    int doc;
+    Sentence s;
+};
+
+struct Match {
+    int id = -1;
+    double score = 0;
+};
+
+using Results = vector<vector<Match>>;
+
+// Convert sentence to unique lowercase words
+vector<string> words(string s) {
+    for (char& c : s)
+        c = isalnum((unsigned char)c)
+            ? (char)tolower((unsigned char)c) : ' ';
+
+    stringstream ss(s);
+    string x;
+    vector<string> w;
+
+    while (ss >> x)
+        w.push_back(x);
+
+    sort(w.begin(), w.end());
+    w.erase(unique(w.begin(), w.end()), w.end());
+    return w;
+}
+
+// Read document and split into sentences
+vector<Sentence> readFile(string path) {
+    ifstream f(path);
+
+    if (!f) {
+        cerr << "Cannot read: " << path << '\n';
+        exit(1);
+    }
+
+    string text((istreambuf_iterator<char>(f)),
+                istreambuf_iterator<char>());
+
+    vector<Sentence> result;
+    string current;
+
+    auto save = [&]() {
+        size_t p = current.find_first_not_of(" \t\r\n");
+
+        if (p != string::npos) {
+            string s = current.substr(p);
+            result.push_back({s, words(s)});
+        }
+        current.clear();
+    };
+
+    for (int i = 0; i < (int)text.size(); i++) {
+        char c = text[i];
+        current += c;
+
+        bool decimal = c == '.' && i > 0 &&
+            i + 1 < (int)text.size() &&
+            isdigit((unsigned char)text[i - 1]) &&
+            isdigit((unsigned char)text[i + 1]);
+
+        if ((c == '.' || c == '!' || c == '?') && !decimal)
+            save();
+    }
+
+    if (!current.empty())
+        save();
+
+    return result;
+}
+
+// Jaccard similarity
+double jaccard(const vector<string>& a,
+               const vector<string>& b) {
+    int i = 0, j = 0, common = 0;
+
+    while (i < (int)a.size() && j < (int)b.size()) {
+        if (a[i] == b[j]) {
+            common++;
+            i++;
+            j++;
+        }
+        else if (a[i] < b[j])
+            i++;
+        else
+            j++;
+    }
+
+    int total = (int)a.size() + (int)b.size() - common;
+
+    return total ? (double)common / total : 0;
+}
+
+// Store best matching sentence
+void update(Results& r, int d, int i,
+            int j, double score) {
+    Match& m = r[d][i];
+
+    if (score >= T &&
+        (score > m.score ||
+        (score == m.score &&
+        (m.id == -1 || j < m.id)))) {
+        m = {j, score};
+    }
+}
+
+// APPROACH 1: BRUTE FORCE
+Results bruteForce(const vector<Sentence>& mainDoc,
+                   const vector<Source>& sources, int D) {
+
+    Results r(D, vector<Match>(mainDoc.size()));
+
+    for (int i = 0; i < (int)mainDoc.size(); i++)
+        for (int j = 0; j < (int)sources.size(); j++)
+            update(r, sources[j].doc, i, j,
+                   jaccard(mainDoc[i].w, sources[j].s.w));
+
+    return r;
+}
+
+// APPROACH 2: HASHING + INVERTED INDEX
+Results hashing(const vector<Sentence>& mainDoc,
+                const vector<Source>& sources, int D) {
+
+    unordered_map<string, vector<int>> index;
+
+    // Build one hash index for all documents
+    for (int j = 0; j < (int)sources.size(); j++)
+        for (const string& w : sources[j].s.w)
+            index[w].push_back(j);
+
+    Results r(D, vector<Match>(mainDoc.size()));
+    vector<int> seen(sources.size(), -1);
+
+    for (int i = 0; i < (int)mainDoc.size(); i++) {
+        vector<string> query = mainDoc[i].w;
+
+        // Search rare words first
+        auto freq = [&](const string& w) {
+            auto it = index.find(w);
+            return it == index.end()
+                ? 0 : (int)it->second.size();
+        };
+
+        sort(query.begin(), query.end(),
+            [&](const string& a, const string& b) {
+                return freq(a) < freq(b);
+            });
+
+        // Safe Jaccard prefix filter
+        int p = (int)floor((1.0 - T) *
+                            query.size() + 1e-9) + 1;
+
+        for (int k = 0;
+             k < p && k < (int)query.size(); k++) {
+
+            auto it = index.find(query[k]);
+            if (it == index.end())
+                continue;
+
+            for (int j : it->second) {
+                if (seen[j] == i)
+                    continue;
+
+                seen[j] = i;
+
+                int a = (int)mainDoc[i].w.size();
+                int b = (int)sources[j].s.w.size();
+
+                // Skip sentences with incompatible lengths
+                if (b < T * a || a < T * b)
+                    continue;
+
+                update(r, sources[j].doc, i, j,
+                       jaccard(mainDoc[i].w,
+                               sources[j].s.w));
+            }
+        }
+    }
+
+    return r;
+}
+
+int main() {
+    vector<Sentence> mainDoc = readFile("main_doc.txt");
+
+    if (mainDoc.empty() || !fs::exists("documents")) {
+        cerr << "Missing input\n";
+        return 1;
+    }
+
+    // Read all documents automatically
+    vector<fs::path> paths;
+
+    for (const auto& f : fs::directory_iterator("documents"))
+        if (f.is_regular_file() &&
+            f.path().extension() == ".txt")
+            paths.push_back(f.path());
+
+    sort(paths.begin(), paths.end());
+
+    vector<string> names;
+    vector<Source> sources;
+
+    for (int d = 0; d < (int)paths.size(); d++) {
+        names.push_back(paths[d].filename().string());
+
+        for (auto& s : readFile(paths[d].string()))
+            sources.push_back({d, s});
+    }
+
+    if (names.empty()) {
+        cerr << "No .txt files\n";
+        return 1;
+    }
+
+    // Measure both algorithms
+    auto t1 = chrono::steady_clock::now();
+
+    Results slow = bruteForce(
+        mainDoc, sources, (int)names.size());
+
+    auto t2 = chrono::steady_clock::now();
+
+    Results fast = hashing(
+        mainDoc, sources, (int)names.size());
+
+    auto t3 = chrono::steady_clock::now();
+
+    // Check matching results and rank documents
+    bool same = true;
+    vector<pair<int, int>> ranking;
+
+    for (int d = 0; d < (int)names.size(); d++) {
+        int count = 0;
+
+        for (int i = 0; i < (int)mainDoc.size(); i++) {
+            count += (fast[d][i].id != -1);
+
+            if (fast[d][i].id != slow[d][i].id)
+                same = false;
+        }
+
+        ranking.push_back({-count, d});
+    }
+
+    sort(ranking.begin(), ranking.end());
+
+    // Print documents from most to least similar
+    cout << fixed << setprecision(1);
+
+    for (int rank = 0; rank < (int)ranking.size(); rank++) {
+        int d = ranking[rank].second;
+
+        cout << rank + 1 << ") " << names[d] << "\n";
+        cout << "similarity "
+             << 100.0 * (-ranking[rank].first)
+                / mainDoc.size() << "%\n";
+
+        vector<int> matches;
+
+        for (int i = 0; i < (int)mainDoc.size(); i++)
+            if (fast[d][i].id != -1)
+                matches.push_back(i);
+
+        sort(matches.begin(), matches.end(),
+             [&](int a, int b) {
+                if (fast[d][a].score != fast[d][b].score)
+                    return fast[d][a].score > fast[d][b].score;
+
+                return a < b;
+             });
+
+        // Print up to five matching sentence pairs
+        int printed = 0;
+
+        for (int i : matches) {
+            if (printed == 5)
+                break;
+
+            int j = fast[d][i].id;
+
+            cout << '"' << mainDoc[i].text << "\"\n";
+            cout << '"' << sources[j].s.text << "\"\n";
+
+            printed++;
+        }
+
+        cout << '\n';
+    }
+
+    // Total execution times
+    double slowMs =
+        chrono::duration<double, milli>(t2 - t1).count();
+
+    double fastMs =
+        chrono::duration<double, milli>(t3 - t2).count();
+
+    cerr << "Main sentences: " << mainDoc.size()
+         << ", Documents: " << names.size() << '\n';
+
+    cerr << fixed << setprecision(3);
+
+    cerr << "Brute Force: " << slowMs << " ms\n";
+    cerr << "Hashing: " << fastMs << " ms\n";
+
+    if (fastMs > 0)
+        cerr << "Speedup: " << slowMs / fastMs << "x\n";
+
+    cerr << "Same matches: "
+         << (same ? "YES" : "NO") << '\n';
+
+    return 0;
+}
+
