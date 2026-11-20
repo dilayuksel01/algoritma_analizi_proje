@@ -22,10 +22,10 @@ ilerleme günlüğü için **[docs/progress.md](docs/progress.md)**; bekleyen ka
 | Materyal incelemesi & kapsam analizi | ✅ bitti |
 | Tasarım belgesi | ✅ bitti |
 | Repo yapısı & dokümantasyon | ✅ bitti |
-| Brute force sürümü (`brute_force`) | ⏳ planlandı |
-| Efficient sürümü (`better_solution`) | ⏳ planlandı |
-| Örnek-set testi vs `expected_output.txt` | ⏳ planlandı |
-| Benchmark'lar (timing table + plot) | ⏳ planlandı |
+| Brute force sürümü (`brute_force.cpp`) | ✅ bitti |
+| Efficient sürümü (`better_solution.cpp`) | ✅ bitti |
+| Örnek-set testi vs `expected_output.txt` | ✅ bitti (%100 eşleşti) |
+| Benchmark'lar (timing table + plot) | ⏳ sırada |
 | Rapor (4–6 sayfa) | ⏳ planlandı |
 | Sunum | ⏳ planlandı |
 
@@ -46,11 +46,10 @@ ilerleme günlüğü için **[docs/progress.md](docs/progress.md)**; bekleyen ka
 
 ```
 algoritma_analizi_proje/
-├── README.md              # bu dosya
+├── README.md              # genel bakış, durum ve talimatlar
+├── CMakeLists.txt         # CMake derleme yapılandırması
+├── main.cpp               # tek dosya C++ kodu (PDF teslimi için hazır)
 ├── .gitignore
-├── main                   # (kod — placeholder) giriş + timing
-├── brute_force            # (kod — placeholder) brute force detector
-├── better_solution        # (kod — placeholder) efficient detector
 ├── docs/
 │   ├── design.md          # tam tasarım (yaklaşım, complexity, gerekçeler)
 │   ├── progress.md        # ilerleme günlüğü
@@ -59,16 +58,15 @@ algoritma_analizi_proje/
 └── data/sample_set/       # verilen örnek (main_doc.txt, documents/, expected_output.txt)
 ```
 
-Kod dosyaları (`main` / `brute_force` / `better_solution`) uygulama aşamasında `.cpp`
-olur; ortak yardımcılar için bir `common.hpp` eklenir.
+Tüm program mantığı (Brute Force + Efficient Hashing + Output), teslim edilecek PDF'e doğrudan kopyalanabilmesi için temiz, sade ve iyi yorumlanmış tek bir **`main.cpp`** dosyasında toplanmıştır.
 
-## Derleme ve çalıştırma (planlanan)
+## Derleme ve çalıştırma
 
-```
-g++ -O2 -std=c++17 main.cpp brute_force.cpp better_solution.cpp -o plagiarism
+```bash
+g++ -O2 -std=c++17 main.cpp -o plagiarism
 ./plagiarism              # bulunulan klasörde main_doc.txt + documents/ okur, raporu yazar (efficient)
 ./plagiarism --brute      # brute force sürümünü çalıştırır
-./plagiarism --benchmark  # ikisini çalıştırıp timing yazdırır
+./plagiarism --benchmark  # ikisini çalıştırıp timing ve doğrulama karşılaştırması yazdırır
 ```
 
 ## Test

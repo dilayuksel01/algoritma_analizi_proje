@@ -5,6 +5,24 @@ giriş en üstte. Her giriş: ne yapıldı, sırada ne var, kararlar, açık sor
 
 ---
 
+## 2026-11-20 — Modüler C++ Kodlama Tamamlandı & Doğrulandı
+
+**Yapıldı**
+- Kök dizindeki uzantısız taslak dosyalar (`main`, `brute_force`, `better_solution`) kaldırılıp, temiz ve modüler `.cpp` / `.hpp` mimarisine geçildi:
+  - `common.hpp`: Cümle bölme (abbreviation ve decimal korumalı), tokenization, Jaccard benzerliği ($O(|a|+|b|)$) ve elle yazılmış **64-bit Polynomial Rolling Hash** (`polynomialHash` ve `CustomStringHash`).
+  - `brute_force.hpp` & `brute_force.cpp`: $O(S_m \cdot S_d \cdot L)$ karşılaştırma yapan baseline algoritma.
+  - `better_solution.hpp` & `better_solution.cpp`: Kendi hash fonksiyonumuz ile oluşturulan Ters İndeks (Inverted Index), nadir kelimelere göre sıralama (rare words first), Pigeonhole prensipli Prefix Filtering ve Uzunluk Filtresi (Length Filter).
+  - `main.cpp`: Standart çalıştırma, `--brute` ve `--benchmark` bayrakları. Çıktı formatı `expected_output.txt` ile birebir uyumlu.
+- Program `g++ -O2 -std=c++17 main.cpp brute_force.cpp better_solution.cpp -o plagiarism` ile derlendi.
+- `data/sample_set` üzerinde test edildi:
+  - Beklenen tüm belgeler tam oranlarla tespit edildi (`document18.txt`: 26.7%, `document14.txt`: 16.7%, `document20.txt`: 13.3%, `document3.txt`: 6.7%, `document4.txt`: 3.3%, diğerleri: 0.0%).
+  - Brute Force ve Efficient sürümlerinin **%100 aynı sonuçları** (`Identical matches: YES`) ürettiği doğrulandı.
+  - 20 dokümanda dahi **4.3x hızlanma** ölçüldü.
+
+**Sırada**
+- Farklı doküman boyutlarında hız testi (Benchmark tablosu ve grafiği - Bölüm B).
+- Rapor taslağının oluşturulması (Bölüm C).
+
 ## 2026-11-17 — Dokümanlar Türkçeleştirildi + GitHub'a push
 
 **Yapıldı**
