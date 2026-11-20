@@ -427,22 +427,60 @@ int main(int argc, char* argv[]) {
 
     // 6. Benchmark summary (if requested)
     if (modeBenchmark) {
-        bool same = true;
-        for (int d = 0; d < numDocs; d++) {
-            for (int i = 0; i < totalMain; i++) {
-                if (fastRes[d][i].sourceIndex != slowRes[d][i].sourceIndex) {
-                    same = false;
-                    break;
-                }
+        cerr << "\n=================== BENCHMARK REPORT (PURE C++) ===================\n";
+        cerr << "| Documents (D) | Brute Force (ms) | Efficient (ms) | Speedup Factor |\n";
+        cerr << "|:-------------:|:----------------:|:--------------:|:--------------:|\n";
+
+        // Test 5 evenly spaced input sizes
+        vector<int> testSizes;
+        for (int step = 1; step <= 5; step++) {
+            int count = (numDocs * step) / 5;
+            if (count > 0 && (testSizes.empty() || count > testSizes.back())) {
+                testSizes.push_back(count);
             }
         }
 
-        cerr << "\n--- BENCHMARK REPORT ---\n";
-        cerr << fixed << setprecision(3);
-        cerr << "Brute Force time : " << tBrute << " ms\n";
-        cerr << "Efficient time   : " << tFast << " ms\n";
-        if (tFast > 0) cerr << "Speedup achieved : " << (tBrute / tFast) << "x\n";
-        cerr << "Identical matches: " << (same ? "YES" : "NO") << "\n";
+        bool allIdentical = true;
+
+        for (int dCount : testSizes) {
+            // Filter sources belonging to the first dCount documents
+            vector<SourceSentence> subsetSources;
+            for (const auto& s : allSources) {
+                if (s.docId < dCount) {
+                    subsetSources.push_back(s);
+                }
+            }
+
+            // Time Brute Force
+            auto t0 = chrono::steady_clock::now();
+            Results slow = bruteForce(mainDoc, subsetSources, dCount);
+            auto t1 = chrono::steady_clock::now();
+            double bMs = chrono::duration<double, milli>(t1 - t0).count();
+
+            // Time Efficient Hashing
+            auto t2 = chrono::steady_clock::now();
+            Results fast = efficientSearch(mainDoc, subsetSources, dCount);
+            auto t3 = chrono::steady_clock::now();
+            double fMs = chrono::duration<double, milli>(t3 - t2).count();
+
+            // Verify correctness
+            for (int d = 0; d < dCount; d++) {
+                for (int i = 0; i < totalMain; i++) {
+                    if (fast[d][i].sourceIndex != slow[d][i].sourceIndex) {
+                        allIdentical = false;
+                    }
+                }
+            }
+
+            double sp = (fMs > 0.0) ? (bMs / fMs) : 0.0;
+            cerr << "| " << setw(13) << dCount << " | "
+                 << setw(13) << fixed << setprecision(2) << bMs << " ms | "
+                 << setw(11) << fixed << setprecision(2) << fMs << " ms | "
+                 << setw(12) << fixed << setprecision(2) << sp << "x |\n";
+        }
+
+        cerr << "===================================================================\n";
+        cerr << "Match Verification : " << (allIdentical ? "ALL MATCHES 100% IDENTICAL" : "MISMATCH DETECTED") << "\n";
     }
 
     return 0;

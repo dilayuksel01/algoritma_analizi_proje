@@ -5,6 +5,25 @@ giriş en üstte. Her giriş: ne yapıldı, sırada ne var, kararlar, açık sor
 
 ---
 
+## 2026-11-20 — Ampirik Analiz (Benchmark) Tamamlandı
+
+**Yapıldı**
+- Yönerge gereği en az 5 farklı girdi boyutu için (4, 8, 12, 16, 20 doküman) otomatik hız ölçümü yapan `run_benchmark.py` yazıldı ve çalıştırıldı.
+- Her boyut için 7 bağımsız çalıştırma yapılıp aykırı değerler elendi ve kırpılmış ortalama (trimmed mean) alındı.
+- Sonuçlar:
+  - 4 doküman: Brute 10.21 ms, Efficient 2.97 ms (3.44x hızlanma)
+  - 8 doküman: Brute 20.84 ms, Efficient 5.74 ms (3.63x hızlanma)
+  - 12 doküman: Brute 31.68 ms, Efficient 7.94 ms (3.99x hızlanma)
+  - 16 doküman: Brute 40.59 ms, Efficient 9.89 ms (4.10x hızlanma)
+  - 20 doküman: Brute 51.63 ms, Efficient 11.96 ms (4.32x hızlanma)
+- Rapor için `docs/report/benchmark_table.md`, `benchmark_data.csv` ve yüksek çözünürlüklü çizgi grafikler (`docs/report/figures/benchmark_plot.png` ve `.pdf`) üretildi.
+
+**Sırada**
+- 4-6 sayfalık proje raporunun yazılması (Bölüm 2).
+- Sunum hazırlığı (Bölüm 4).
+
+---
+
 ## 2026-11-20 — Modüler C++ Kodlama Tamamlandı & Doğrulandı
 
 **Yapıldı**

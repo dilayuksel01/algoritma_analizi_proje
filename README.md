@@ -22,10 +22,10 @@ ilerleme günlüğü için **[docs/progress.md](docs/progress.md)**; bekleyen ka
 | Materyal incelemesi & kapsam analizi | ✅ bitti |
 | Tasarım belgesi | ✅ bitti |
 | Repo yapısı & dokümantasyon | ✅ bitti |
-| Brute force sürümü (`brute_force.cpp`) | ✅ bitti |
-| Efficient sürümü (`better_solution.cpp`) | ✅ bitti |
+| Brute force sürümü (`main.cpp`) | ✅ bitti |
+| Efficient sürümü (`main.cpp`) | ✅ bitti |
 | Örnek-set testi vs `expected_output.txt` | ✅ bitti (%100 eşleşti) |
-| Benchmark'lar (timing table + plot) | ⏳ sırada |
+| Benchmark'lar (timing table + plot) | ✅ bitti |
 | Rapor (4–6 sayfa) | ⏳ planlandı |
 | Sunum | ⏳ planlandı |
 
